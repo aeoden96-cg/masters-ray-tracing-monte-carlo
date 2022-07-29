@@ -4,16 +4,13 @@
 #include "color.h"
 #include "hittable.h"
 #include "sphere.h"
+//include yaml
+#include "yaml-cpp/yaml.h"
 
-#include <iostream>
-
-// Type aliases for vec3
-using point3 = glm::vec3;   // 3D point
-using color = glm::vec3;    // RGB color
 
 
 color ray_color(const ray& r, const hittable& world) {
-    hit_record rec;
+    hit_record rec = {};
     if (world.hit(r, 0, infinity, rec)) {
         return 0.5f * (rec.normal + color(1,1,1));
     }
@@ -22,18 +19,44 @@ color ray_color(const ray& r, const hittable& world) {
     return (float)(1.0-t)*color(1.0, 1.0, 1.0) + (float)t*color(0.5, 0.7, 1.0);
 }
 
+
 int main() {
 
-    // Image
+    //get yaml node
+    YAML::Node config = YAML::LoadFile("config.yaml");
+
+
+
+
 
     const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 400;
+    const int image_width = 800;
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // World
     hittable_list world;
-    world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
-    world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
+
+
+    //get sphere list
+    auto spheres = config["elements"];
+    for(auto item : spheres) {
+
+
+        //parse 3d point
+        auto point = item["position"];
+        auto position = point.as<std::vector<float>>();
+        auto position_glm = glm::vec3(position[0], position[1], position[2]);
+
+        //parse radius
+        float radius = item["radius"].as<float>();
+
+
+        //std::cout << position_glm.x << " " << position_glm.y << " " << position_glm.z << std::endl;
+
+        world.add(make_shared<sphere>(position_glm, radius));
+
+
+    }
 
     // Camera
 

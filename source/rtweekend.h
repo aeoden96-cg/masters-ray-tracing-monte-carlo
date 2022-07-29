@@ -8,6 +8,14 @@
 #include <limits>
 #include <memory>
 
+// Common Headers
+#include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+// Type aliases for vec3
+using point3 = glm::vec3;   // 3D point
+using color = glm::vec3;    // RGB color
+
 
 // Usings
 
@@ -26,9 +34,5 @@ inline double degrees_to_radians(double degrees) {
     return degrees * pi / 180.0;
 }
 
-// Common Headers
 
-
-#include <iostream>
-#include <glm/glm.hpp>
 #endif //PROJECT_RTWEEKEND_H
