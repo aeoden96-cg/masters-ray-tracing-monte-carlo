@@ -1,4 +1,5 @@
 
+#include <fstream>
 #include "rtweekend.h"
 
 #include "color.h"
@@ -23,14 +24,14 @@ color ray_color(const ray& r, const hittable& world) {
 int main() {
 
     //get yaml node
+    YAML::Node input = YAML::LoadFile("input.yaml");
     YAML::Node config = YAML::LoadFile("config.yaml");
 
 
 
 
-
-    const auto aspect_ratio = 16.0 / 9.0;
-    const int image_width = 800;
+    const auto aspect_ratio = config["ratio"][0].as<float>() / config["ratio"][1].as<float>();
+    const int image_width =  config["image_width"].as<float>();
     const int image_height = static_cast<int>(image_width / aspect_ratio);
 
     // World
@@ -38,7 +39,7 @@ int main() {
 
 
     //get sphere list
-    auto spheres = config["elements"];
+    auto spheres = input["elements"];
     for(auto item : spheres) {
 
 
@@ -60,18 +61,24 @@ int main() {
 
     // Camera
 
-    auto viewport_height = 2.0;
+    auto viewport_height = config["camera"]["viewport_height"].as<float>();
     auto viewport_width = aspect_ratio * viewport_height;
-    auto focal_length = 1.0;
+    auto focal_length = config["camera"]["focal_length"].as<float>();
 
-    auto origin = point3(0, 0, 0);
+    auto origin = point3(
+            config["camera"]["origin"][0].as<float>(),
+            config["camera"]["origin"][1].as<float>(),
+            config["camera"]["origin"][2].as<float>()
+            );
     auto horizontal = glm::vec3(viewport_width, 0, 0);
     auto vertical = glm::vec3(0, viewport_height, 0);
     auto lower_left_corner = origin - horizontal/2.0f - vertical/2.0f - glm::vec3(0, 0, focal_length);
 
     // Render
 
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    std::fstream file_out("image.ppm", std::ios::out);
+
+    file_out<< "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
     for (int j = image_height-1; j >= 0; --j) {
         std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
@@ -80,7 +87,7 @@ int main() {
             auto v = double(j) / (image_height-1);
             ray r(origin, lower_left_corner + (float)u*horizontal + (float)v*vertical);
             color pixel_color = ray_color(r, world);
-            write_color(std::cout, pixel_color);
+            write_color(file_out, pixel_color);
         }
     }
 
