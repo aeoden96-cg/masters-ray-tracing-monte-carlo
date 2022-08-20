@@ -1,7 +1,7 @@
 ---
 
 ratio: [16, 9]
-image_width: 800
+image_width: 640
 
 camera:
   viewport_height: 2.0
