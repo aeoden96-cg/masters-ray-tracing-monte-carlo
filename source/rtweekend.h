@@ -69,5 +69,16 @@ inline double clamp(double x, double min, double max) {
 }
 
 
+inline static glm::vec3 random_vec3() {
+    return {random_double(), random_double(), random_double()};
+}
+
+inline static glm::vec3 random_vec3(double min, double max) {
+    return {random_double(min,max), random_double(min,max), random_double(min,max)};
+}
+
+
+
+
 
 #endif //PROJECT_RTWEEKEND_H

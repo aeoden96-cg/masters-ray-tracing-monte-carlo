@@ -9,6 +9,27 @@
 #include "yaml-cpp/yaml.h"
 #include "camera.h"
 
+glm::vec3 random_in_unit_sphere() {
+    while (true) {
+        glm::vec3 p = random_vec3(-1,1);
+        if (glm::dot(p,p) >= 1) continue;
+        return p;
+    }
+
+}
+glm::vec3 random_unit_vector() {
+    //unit vector in glm
+    return glm::normalize(random_in_unit_sphere());
+}
+
+glm::vec3 random_in_hemisphere(const glm::vec3& normal) {
+    glm::vec3 in_unit_sphere = random_in_unit_sphere();
+    if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return in_unit_sphere;
+    else
+        return -in_unit_sphere;
+}
+
 class RayTracer {
 public:
     RayTracer(int width, float aspect_ratio)
@@ -27,7 +48,7 @@ public:
                 auto u = double(i) / (width-1);
                 auto v = double(j) / (height-1);
                 ray r(origin, lower_left_corner + (float)u*horizontal + (float)v*vertical);
-                color pixel_color = ray_color(r, world);
+                color pixel_color = ray_color(r, world, 0);
                 write_color_old(file_out, pixel_color);
             }
         }
@@ -35,7 +56,7 @@ public:
     }
     void render(const hittable_list& world){
         std::fstream file_out("image.ppm", std::ios::out);
-
+        const int max_depth = 50;
         camera cam;
 
         file_out << "P3\n" << width << ' ' << height << "\n255\n";
@@ -48,7 +69,7 @@ public:
                     auto u = (i + random_double()) / (width-1);
                     auto v = (j + random_double()) / (height-1);
                     ray r = cam.get_ray(u, v);
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, world, max_depth);
                 }
                 write_color(file_out, pixel_color, 5);
             }
@@ -63,10 +84,16 @@ public:
         lower_left_corner = org - horizontal / 2.0f - vertical / 2.0f - glm::vec3(0, 0, focal_length);
     }
 
-    color ray_color(const ray& r, const hittable& world) { // NOLINT(readability-convert-member-functions-to-static)
+    color ray_color(const ray& r, const hittable& world,int depth) { // NOLINT(readability-convert-member-functions-to-static)
         hit_record rec = {};
-        if (world.hit(r, 0, infinity, rec)) {
-            return 0.5f * (rec.normal + color(1,1,1));
+
+        // If we've exceeded the ray bounce limit, no more light is gathered.
+        if (depth <= 0)
+            return color(0,0,0);
+
+        if (world.hit(r, 0.001f, infinity, rec)) {
+            point3 target = rec.p + random_in_hemisphere(rec.normal);
+            return 0.5f * ray_color(ray(rec.p, target - rec.p), world, depth-1);
         }
         glm::vec3 unit_direction = glm::normalize(r.direction());
         auto t = 0.5*(unit_direction.y + 1.0);
