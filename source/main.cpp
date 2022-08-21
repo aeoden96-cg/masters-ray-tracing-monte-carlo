@@ -9,54 +9,17 @@
 #include "yaml-cpp/yaml.h"
 #include "camera.h"
 
-glm::vec3 random_in_unit_sphere() {
-    while (true) {
-        glm::vec3 p = random_vec3(-1,1);
-        if (glm::dot(p,p) >= 1) continue;
-        return p;
-    }
-
-}
-glm::vec3 random_unit_vector() {
-    //unit vector in glm
-    return glm::normalize(random_in_unit_sphere());
-}
-
-glm::vec3 random_in_hemisphere(const glm::vec3& normal) {
-    glm::vec3 in_unit_sphere = random_in_unit_sphere();
-    if (dot(in_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
-        return in_unit_sphere;
-    else
-        return -in_unit_sphere;
-}
 
 class RayTracer {
 public:
-    RayTracer(int width, float aspect_ratio)
-        : width(width){
+    RayTracer(int width, float aspect_ratio,int max_depth,int samples_per_pixel)
+        : width(width),max_depth(max_depth),samples_per_pixel(samples_per_pixel){
         height = static_cast<int>((float)width / aspect_ratio);
     }
 
-    void render_old(const hittable_list& world){
-        std::fstream file_out("image.ppm", std::ios::out);
-
-        file_out << "P3\n" << width << ' ' << height << "\n255\n";
-
-        for (int j = height-1; j >= 0; --j) {
-            std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
-            for (int i = 0; i < width; ++i) {
-                auto u = double(i) / (width-1);
-                auto v = double(j) / (height-1);
-                ray r(origin, lower_left_corner + (float)u*horizontal + (float)v*vertical);
-                color pixel_color = ray_color(r, world, 0);
-                write_color_old(file_out, pixel_color);
-            }
-        }
-
-    }
     void render(const hittable_list& world){
         std::fstream file_out("image.ppm", std::ios::out);
-        const int max_depth = 50;
+
         camera cam;
 
         file_out << "P3\n" << width << ' ' << height << "\n255\n";
@@ -65,23 +28,29 @@ public:
             std::cerr << "\rScanlines remaining: " << j << ' ' << std::flush;
             for (int i = 0; i < width; ++i) {
                 color pixel_color(0, 0, 0);
-                for (int s = 0; s < 5; ++s) {
-                    auto u = (i + random_double()) / (width-1);
-                    auto v = (j + random_double()) / (height-1);
+                for (int s = 0; s < samples_per_pixel; ++s) {
+                    float u = (float)(i + random_double()) / (float)(width-1);
+                    float v = (float)(j + random_double()) / (float)(height-1);
                     ray r = cam.get_ray(u, v);
                     pixel_color += ray_color(r, world, max_depth);
                 }
-                write_color(file_out, pixel_color, 5);
+                write_color(file_out, pixel_color, samples_per_pixel);
             }
         }
 
     }
 
-    void calculate_camera_and_viewport(float viewport_width,float viewport_height, float focal_length, point3 org){
+    void calculate_camera_and_viewport(
+            float viewport_width,
+            float viewport_height,
+            float focal_length,
+            point3 org
+           ){
         this->origin = org;
         horizontal = glm::vec3(viewport_width, 0, 0);
         vertical = glm::vec3(0, viewport_height, 0);
         lower_left_corner = org - horizontal / 2.0f - vertical / 2.0f - glm::vec3(0, 0, focal_length);
+
     }
 
     color ray_color(const ray& r, const hittable& world,int depth) { // NOLINT(readability-convert-member-functions-to-static)
@@ -89,7 +58,7 @@ public:
 
         // If we've exceeded the ray bounce limit, no more light is gathered.
         if (depth <= 0)
-            return color(0,0,0);
+            return {0,0,0};
 
         if (world.hit(r, 0.001f, infinity, rec)) {
             point3 target = rec.p + random_in_hemisphere(rec.normal);
@@ -103,6 +72,8 @@ public:
 private:
     int width;
     int height;
+    int max_depth;
+    int samples_per_pixel;
     //float aspect_ratio;
     point3 origin = point3(0, 0, 0);
     glm::vec3 horizontal = glm::vec3(4, 0, 0);
@@ -119,9 +90,10 @@ int main() {
 
     const float aspect_ratio = config["ratio"][0].as<float>() / config["ratio"][1].as<float>();
     const int image_width =  config["image_width"].as<int>();
-    const int samples_per_pixel = 100;
+    const int samples_per_pixel = config["samples_per_pixel"].as<int>();
+    const int max_depth = config["max_depth"].as<int>();
 
-    RayTracer tracer(image_width, aspect_ratio);
+    RayTracer tracer(image_width, aspect_ratio,max_depth,samples_per_pixel);
 
     // World
     hittable_list world;

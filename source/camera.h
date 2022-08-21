@@ -11,6 +11,8 @@
 class camera {
 public:
     camera();
+
+    [[nodiscard]]
     ray get_ray(float u, float v) const;
 
 

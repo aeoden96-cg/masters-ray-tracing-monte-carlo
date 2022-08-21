@@ -25,7 +25,6 @@ bool sphere::hit(const ray& r, double t_min, double t_max, hit_record& rec) cons
     rec.p = r.at(rec.t);
     glm::vec3 outward_normal = (rec.p - center) / (float)radius;
     rec.set_face_normal(r, outward_normal);
-    //rec.normal = (float)(1.0f/radius) * glm::vec3(rec.p - center);
 
     return true;
 }

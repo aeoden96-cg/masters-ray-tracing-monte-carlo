@@ -13,7 +13,7 @@ ADD_EXECUTABLE(PROJECT
         source/hittable_list.cpp
         source/hittable_list.h
         source/rtweekend.h
-        source/color.h source/camera.cpp source/camera.h)
+        source/color.h source/camera.cpp source/camera.h source/rtweekend.cpp)
 
 
 target_link_libraries(
