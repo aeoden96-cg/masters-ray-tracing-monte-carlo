@@ -19,6 +19,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "ray.h"
+
+
 // Type aliases for vec3
 
 using point3 = glm::vec3;   // 3D point
@@ -52,5 +55,7 @@ glm::vec3 random_in_unit_sphere();
 glm::vec3 random_unit_vector();
 glm::vec3 random_in_hemisphere(const glm::vec3& normal);
 
+bool near_zero(glm::vec3 vec);
+glm::vec3 reflect(const glm::vec3& v, const glm::vec3& n);
 
 #endif //PROJECT_RTWEEKEND_H

@@ -59,3 +59,14 @@ glm::vec3 random_in_hemisphere(const glm::vec3& normal) {
     else
         return -in_unit_sphere;
 }
+
+
+bool near_zero(glm::vec3 vec) {
+    // Return true if the vector is close to zero in all dimensions.
+    const auto s = 1e-8;
+    return (fabs(vec.x) < s) && (fabs(vec.y) < s) && (fabs(vec.z) < s);
+}
+
+glm::vec3 reflect(const glm::vec3& v, const glm::vec3& n) {
+    return v - 2*dot(v,n)*n;
+}

@@ -4,7 +4,9 @@
 
 #ifndef PROJECT_HITTABLE_H
 #define PROJECT_HITTABLE_H
-#include "ray.h"
+#include "rtweekend.h"
+
+class material;
 
 using point3 = glm::vec3;   // 3D point
 using color = glm::vec3;    // RGB color
@@ -12,6 +14,7 @@ using color = glm::vec3;    // RGB color
 struct hit_record {
     point3 p;
     glm::vec3 normal;
+    shared_ptr<material> mat_ptr;
     double t;
     bool front_face;
 
