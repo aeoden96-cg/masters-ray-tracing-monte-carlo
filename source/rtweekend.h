@@ -57,5 +57,8 @@ glm::vec3 random_in_hemisphere(const glm::vec3& normal);
 
 bool near_zero(glm::vec3 vec);
 glm::vec3 reflect(const glm::vec3& v, const glm::vec3& n);
+glm::vec3 refract(const glm::vec3& uv, const glm::vec3& n, double etai_over_etat);
+
+glm::vec3 random_in_unit_disk();
 
 #endif //PROJECT_RTWEEKEND_H

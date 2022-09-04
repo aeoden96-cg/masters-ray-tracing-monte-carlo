@@ -70,3 +70,20 @@ bool near_zero(glm::vec3 vec) {
 glm::vec3 reflect(const glm::vec3& v, const glm::vec3& n) {
     return v - 2*dot(v,n)*n;
 }
+
+glm::vec3 refract(const glm::vec3& uv, const glm::vec3& n, float etai_over_etat) {
+    auto cos_theta = (float)fmin(dot(-uv, n), 1.0);
+    glm::vec3 r_out_perp =  etai_over_etat * (uv + cos_theta*n);
+    auto r_out_perp_length_squared = glm::dot(r_out_perp, r_out_perp);
+    glm::vec3 r_out_parallel = -(float)sqrt(fabs(1.0 - r_out_perp_length_squared)) * n;
+    return r_out_perp + r_out_parallel;
+}
+
+glm::vec3 random_in_unit_disk() {
+    while (true) {
+        auto p = glm::vec3(random_double(-1,1), random_double(-1,1), 0);
+        auto p_squared_length = glm::dot(p, p);
+        if (p_squared_length >= 1) continue;
+        return p;
+    }
+}

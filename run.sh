@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ "$1" = "build" ] ; then
+  mkdir build
   cd build
   cmake ..
   make clean
