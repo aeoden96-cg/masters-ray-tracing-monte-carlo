@@ -5,8 +5,8 @@
 #ifndef PROJECT_CAMERA_H
 #define PROJECT_CAMERA_H
 
-#include "rtweekend.h"
-#include "ray.h"
+#include "./../utils/utils.h"
+#include "./../ray/ray.h"
 
 class camera {
 public:

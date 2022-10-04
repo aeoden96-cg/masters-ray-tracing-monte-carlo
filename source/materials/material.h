@@ -5,8 +5,8 @@
 #ifndef PROJECT_MATERIAL_H
 #define PROJECT_MATERIAL_H
 
-#include "rtweekend.h"
-#include "hittable.h"
+#include "./../utils/utils.h"
+#include "./../objects/hittable.h"
 
 
 struct hit_record;

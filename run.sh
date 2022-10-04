@@ -1,7 +1,8 @@
-#!/bin/bash
+#!/usr/bin/zsh
 
 if [ "$1" = "build" ] ; then
-  mkdir build
+  rm -rf /build/{*,.*}
+  mkdir -p build
   cd build
   cmake ..
   make clean
@@ -17,7 +18,7 @@ fi
 
 # run the project
 cd build
-./PROJECT > image.ppm
+./source/PROJECT > image.ppm
 pnmtopng image.ppm > ../result.png
 rm image.ppm
 cd ..
