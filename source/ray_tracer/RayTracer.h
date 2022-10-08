@@ -33,10 +33,10 @@ private:
     int max_depth;
     int samples_per_pixel;
     //float aspect_ratio;
-    point3 origin = point3(0, 0, 0);
-    glm::vec3 horizontal = glm::vec3(4, 0, 0);
-    glm::vec3 vertical = glm::vec3(0, 2, 0);
-    point3 lower_left_corner = point3(-2, -1, -1);
+    point3 origin;
+    glm::vec3 horizontal;
+    glm::vec3 vertical;
+    point3 lower_left_corner;
 };
 
 #endif //PROJECT_RAYTRACER_H

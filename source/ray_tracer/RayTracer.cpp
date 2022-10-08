@@ -2,6 +2,7 @@
 
 #include "RayTracer.h"
 
+
 RayTracer::RayTracer(
   int width, 
   float aspect_ratio,
@@ -11,20 +12,21 @@ RayTracer::RayTracer(
   width(width),
   max_depth(max_depth),
   samples_per_pixel(samples_per_pixel){
-    height = static_cast<int>((float)width / aspect_ratio);
+  height = static_cast<int>((float)width / aspect_ratio);
 }
 
 void RayTracer::render(const hittable_list& world){
   std::fstream file_out("image.ppm", std::ios::out);
 
-  const auto aspect_ratio = 3.0 / 2.0;
-  point3 lookfrom(13,2,3);
-  point3 lookat(0,0,0);
-  glm::vec3 vup(0,1,0);
-  auto dist_to_focus = 10.0;
-  auto aperture = 0.1;
 
-  camera cam(lookfrom, lookat, vup, 20, aspect_ratio, aperture, dist_to_focus);
+  camera cam(
+          this->origin,
+          point3 (0,0,0),
+          point3 (0,1,0),
+          20,
+          (float)width / (float)height,
+          0.1f,
+          glm::length(this->origin));
 
   file_out << "P3\n" << width << ' ' << height << "\n255\n";
 
@@ -49,10 +51,10 @@ void RayTracer::calculate_camera_and_viewport(
   float focal_length,
   point3 org
   ){
-  this->origin = org;
-  horizontal = glm::vec3(viewport_width, 0, 0);
-  vertical = glm::vec3(0, viewport_height, 0);
-  lower_left_corner = org - horizontal / 2.0f - vertical / 2.0f - glm::vec3(0, 0, focal_length);
+    this->origin = org;
+    this->horizontal = glm::vec3(viewport_width, 0, 0);
+    this->vertical = glm::vec3(0, viewport_height, 0);
+    this->lower_left_corner = org - horizontal / 2.0f - vertical / 2.0f - glm::vec3(0, 0, focal_length);
 }
 
 
@@ -68,6 +70,8 @@ color RayTracer::ray_color(const ray& r, const hittable& world,int depth){ // NO
             color attenuation;
             if (rec.mat_ptr->scatter(r, rec, attenuation, scattered))
                 return attenuation * ray_color(scattered, world, depth - 1);
+            else if(rec.mat_ptr->is_light())
+              return rec.mat_ptr->emitted();
             return {0, 0, 0};
 
         }

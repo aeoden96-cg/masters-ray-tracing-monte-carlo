@@ -59,70 +59,95 @@ hittable_list random_scene() {
     return world;
 }
 
+
+hittable_list read_file(){
+    YAML::Node config = YAML::LoadFile("input.yaml");
+
+    std::cout << "Loading scene from YAML file..." << std::endl;
+
+    // load spheres
+    int sphere_count = config.size();
+
+    std::cout << "Loading " << sphere_count << " spheres..." << std::endl;
+
+    hittable_list h;
+
+    for(int i= 0; i < sphere_count; i++){
+
+        sphere s;
+
+        s.radius = config[i]["sphere"]["radius"].as<float>();
+
+
+        s.center = point3(
+                config[i]["sphere"]["position"]["x"].as<float>(),
+                config[i]["sphere"]["position"]["y"].as<float>(),
+                config[i]["sphere"]["position"]["z"].as<float>()
+        );
+
+        auto c = point3(
+                config[i]["sphere"]["color"]["r"].as<float>(),
+                config[i]["sphere"]["color"]["g"].as<float>(),
+                config[i]["sphere"]["color"]["b"].as<float>()
+        );
+//
+//        s.emission = float3(
+//                config["SPHERES"][i]["emission"]["r"].as<float>(),
+//                config["SPHERES"][i]["emission"]["g"].as<float>(),
+//                config["SPHERES"][i]["emission"]["b"].as<float>()
+//        );
+
+        auto ground_material = make_shared<lambertian>(c);
+
+
+
+        auto light_material = make_shared<light>(color (9,9,9));
+
+
+      // auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
+//        auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
+
+        if(config[i]["sphere"]["emission"]["r"].as<float>() > 0.0){
+            h.add(make_shared<sphere>(s.center, s.radius, light_material));
+            std::cout << "Added light" << std::endl;
+        }else
+            h.add(make_shared<sphere>(s.center, s.radius, ground_material));
+    }
+    return h;
+}
+
+
 int main() {
 
     //get yaml node
     YAML::Node input = YAML::LoadFile("input.yaml");
     YAML::Node config = YAML::LoadFile("config.yaml");
 
-     float aspect_ratio = config["ratio"][0].as<float>() / config["ratio"][1].as<float>();
-     int image_width =  config["image_width"].as<int>();
-     int samples_per_pixel = config["samples_per_pixel"].as<int>();
-     int max_depth = config["max_depth"].as<int>();
+    float aspect_ratio = config["ratio"][0].as<float>() / config["ratio"][1].as<float>();
+    int image_width =  config["image_width"].as<int>();
+    int samples_per_pixel = config["samples_per_pixel"].as<int>();
+    int max_depth = config["max_depth"].as<int>();
 
-    aspect_ratio = 3.0f / 2.0f;
-    image_width = 320;
-   samples_per_pixel = 20;
-    max_depth = 5;
 
     RayTracer tracer(image_width, aspect_ratio,max_depth,samples_per_pixel);
 
-    // World
-    auto R = cos(pi/4);
-    /*hittable_list world;
 
-
-    auto material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
-    auto material_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-    auto material_left   = make_shared<dielectric>(1.5);
-    auto material_right  = make_shared<metal>(color(0.8, 0.6, 0.2), 0.0);
-
-    world.add(make_shared<sphere>(point3( 0.0, -100.5, -1.0), 100.0, material_ground));
-    world.add(make_shared<sphere>(point3( 0.0,    0.0, -1.0),   0.5, material_center));
-    world.add(make_shared<sphere>(point3(-1.0,    0.0, -1.0),  -0.4, material_left));
-    world.add(make_shared<sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));*/
-
-    auto world = random_scene();
-
-
-//    //get sphere list
-//    auto spheres = input["elements"];
-//    for(auto item : spheres) {
-//
-//        //parse 3d point
-//        auto point = item["position"];
-//        auto position = point.as<std::vector<float>>();
-//        auto position_glm = glm::vec3(position[0], position[1], position[2]);
-//
-//        //parse radius
-//        auto radius = item["radius"].as<float>();
-//        world.add(make_shared<sphere>(position_glm, radius));
-//    }
-
-    //camera cam;
+//    auto world = random_scene();
+    auto world = read_file();
 
     // Camera and viewport
     auto viewport_height = config["camera"]["viewport_height"].as<float>();
-    auto viewport_width = aspect_ratio * viewport_height;
-    auto focal_length = config["camera"]["focal_length"].as<float>();
     auto origin = point3(
             config["camera"]["origin"][0].as<float>(),
             config["camera"]["origin"][1].as<float>(),
             config["camera"]["origin"][2].as<float>()
     );
 
-
-    tracer.calculate_camera_and_viewport(viewport_width, viewport_height, focal_length, origin);
+    tracer.calculate_camera_and_viewport(
+            aspect_ratio * viewport_height,
+            viewport_height,
+            config["camera"]["focal_length"].as<float>(),
+            origin);
 
     // Render
     tracer.render(world);
