@@ -1,14 +1,15 @@
 ---
 
 ratio: [16, 9]
-image_width: 720
-samples_per_pixel: 100
+image_width: 320
+samples_per_pixel: 20
 max_depth: 50
 
 camera:
   viewport_height: 2.0
   focal_length: 1.0
-  origin: [0.0, 0.1, 3]
-
+  look_at: [0, 0, 0]
+#  origin: [0.0, 0.1, 3] //
+  origin: [13, 2, 3]
 
 

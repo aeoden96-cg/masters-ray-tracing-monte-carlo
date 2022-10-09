@@ -18,6 +18,8 @@ public:
     virtual bool hit(
             const ray& r, double t_min, double t_max, hit_record& rec) const override;
 
+    static void get_sphere_uv(const point3& p, double& u, double& v);
+
 public:
     point3 center;
     double radius;

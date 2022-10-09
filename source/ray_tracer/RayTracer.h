@@ -22,10 +22,11 @@ public:
       float viewport_width,
       float viewport_height,
       float focal_length,
-      point3 org
+      point3 org,
+      point3 look_at
       );
 
-    color ray_color(const ray& r, const hittable& world,int depth);
+    color ray_color(const ray& r, const color& background, const hittable& world, int depth);
 
 private:
     int width;
@@ -34,6 +35,7 @@ private:
     int samples_per_pixel;
     //float aspect_ratio;
     point3 origin;
+    point3 look_at;
     glm::vec3 horizontal;
     glm::vec3 vertical;
     point3 lower_left_corner;

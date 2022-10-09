@@ -7,17 +7,18 @@
 
 #include "./../utils/utils.h"
 #include "./../objects/hittable.h"
-
+#include "texture.h"
 
 struct hit_record;
 
 class material {
 public:
+    virtual color emitted(double u, double v, const point3& p) const {
+        return color(0,0,0);
+    }
     virtual bool scatter(
             const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
     ) const = 0;
-
-    [[nodiscard]] virtual bool is_light() const { return false; }
 
     [[nodiscard]] virtual color emitted() const {
         return color(0,0,0);
@@ -26,11 +27,15 @@ public:
 
 class lambertian : public material {
 public:
-    lambertian(const color& a) : albedo(a) {}
+    lambertian(const color& a) : albedo(make_shared<solid_color>(a)) {}
+    lambertian(shared_ptr<texture> a) : albedo(a) {}
 
-    virtual bool scatter(
-            const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-    ) const override {
+    bool scatter(const ray& r_in,
+                 const hit_record& rec,
+                 color& attenuation,
+                 ray& scattered
+                 ) const override
+                 {
         auto scatter_direction = rec.normal + random_unit_vector();
 
 
@@ -39,21 +44,24 @@ public:
             scatter_direction = rec.normal;
 
         scattered = ray(rec.p, scatter_direction);
-        attenuation = albedo;
+        attenuation = albedo->value(rec.u, rec.v, rec.p);
         return true;
     }
 
 public:
-    color albedo;
+    shared_ptr<texture> albedo;
 };
 
 class metal : public material {
 public:
     metal(const color& a, double f) : albedo(a), fuzz(f < 1 ? f : 1) {}
 
-    virtual bool scatter(
-            const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-    ) const override {
+    bool scatter(
+            const ray& r_in,
+            const hit_record& rec,
+            color& attenuation,
+            ray& scattered
+            ) const override {
 
         glm::vec3 reflected = reflect(glm::normalize(r_in.direction()), rec.normal);
         scattered = ray(rec.p, reflected + fuzz*random_in_unit_sphere());
@@ -71,9 +79,12 @@ class dielectric : public material {
     public:
         dielectric(double index_of_refraction) : ir(index_of_refraction) {}
 
-        virtual bool scatter(
-            const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-        ) const override {
+        bool scatter(
+            const ray& r_in,
+            const hit_record& rec,
+            color& attenuation,
+            ray& scattered
+            ) const override {
             attenuation = color(1.0, 1.0, 1.0);
             float refraction_ratio = rec.front_face ? (1.0/ir) : ir;
             glm::vec3 unit_direction = glm::normalize(r_in.direction());
@@ -106,9 +117,10 @@ class dielectric : public material {
         }
 };
 
-class light : public material {
+class diffuse_light : public material  {
 public:
-    light(const color& a) : albedo(a) {}
+    diffuse_light(shared_ptr<texture> a) : emit(a) {}
+    diffuse_light(color c) : emit(make_shared<solid_color>(c)) {}
 
     virtual bool scatter(
             const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
@@ -116,13 +128,15 @@ public:
         return false;
     }
 
-    bool is_light() const override { return true; }
-
-    color emitted() const override { return albedo; }
+    virtual color emitted(double u, double v, const point3& p) const override {
+        return emit->value(u, v, p);
+    }
 
 public:
-    color albedo;
+    shared_ptr<texture> emit;
 };
+
+
 
 
 #endif //PROJECT_MATERIAL_H

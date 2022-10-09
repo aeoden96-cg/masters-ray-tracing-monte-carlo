@@ -23,17 +23,20 @@ ADD_EXECUTABLE(PROJECT
         source/utils/utils.h
         source/ray_tracer/RayTracer.cpp
         source/ray_tracer/RayTracer.h
-        )
+        source/materials/texture.cpp source/materials/texture.h source/objects/xy_rect.cpp source/objects/xy_rect.h)
 
 target_link_libraries(
         PROJECT LINK_PUBLIC -lyaml-cpp
 #        -lGLEW -lGL -lGLU -lglut -lpthread -lm
         )
 
-# copy config.yaml to build directory
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/config.yaml
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# copy config.yaml and input.yaml to build directory
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.yaml
+                ${CMAKE_CURRENT_BINARY_DIR}/config.yaml COPYONLY)
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/input.yaml
+                ${CMAKE_CURRENT_BINARY_DIR}/input.yaml COPYONLY)
+
+
 
 

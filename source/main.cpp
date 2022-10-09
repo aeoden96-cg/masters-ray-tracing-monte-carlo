@@ -11,11 +11,36 @@
 #include "materials/material.h"
 #include "ray_tracer/RayTracer.h"
 
+//hittable_list cornell_box() {
+//    hittable_list objects;
+//
+//    auto red   = make_shared<lambertian>(color(.65, .05, .05));
+//    auto white = make_shared<lambertian>(color(.73, .73, .73));
+//    auto green = make_shared<lambertian>(color(.12, .45, .15));
+//    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+//
+//    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+//    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+//    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+//    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+//    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+//    objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+//
+////    lookfrom = point3(278, 278, -800);
+////    lookat = point3(278, 278, 0);
+//
+//    return objects;
+//}
+
 hittable_list random_scene() {
     hittable_list world;
 
-    auto ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
-    world.add(make_shared<sphere>(point3(0,-1000,0), 1000, ground_material));
+    auto checker = make_shared<checker_texture>(color(0.2, 0.3, 0.1), color(0.9, 0.9, 0.9));
+    auto difflight = make_shared<diffuse_light>(color(4,4,4));
+
+
+
+    world.add(make_shared<sphere>(point3(0,-1000,0), 1000, make_shared<diffuse_light>(color(4,4,4))));
 
     for (int a = -11; a < 11; a++) {
         for (int b = -11; b < 11; b++) {
@@ -101,7 +126,7 @@ hittable_list read_file(){
 
 
 
-        auto light_material = make_shared<light>(color (9,9,9));
+        auto light_material = make_shared<diffuse_light>(c);
 
 
       // auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
@@ -132,8 +157,8 @@ int main() {
     RayTracer tracer(image_width, aspect_ratio,max_depth,samples_per_pixel);
 
 
-//    auto world = random_scene();
-    auto world = read_file();
+    auto world = random_scene();
+//    auto world = read_file();
 
     // Camera and viewport
     auto viewport_height = config["camera"]["viewport_height"].as<float>();
@@ -142,12 +167,18 @@ int main() {
             config["camera"]["origin"][1].as<float>(),
             config["camera"]["origin"][2].as<float>()
     );
+    auto look_at = point3(
+            config["camera"]["look_at"][0].as<float>(),
+            config["camera"]["look_at"][1].as<float>(),
+            config["camera"]["look_at"][2].as<float>()
+    );
 
     tracer.calculate_camera_and_viewport(
             aspect_ratio * viewport_height,
             viewport_height,
             config["camera"]["focal_length"].as<float>(),
-            origin);
+            origin,
+            look_at);
 
     // Render
     tracer.render(world);
