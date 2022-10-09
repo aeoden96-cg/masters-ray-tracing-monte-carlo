@@ -23,7 +23,15 @@ ADD_EXECUTABLE(PROJECT
         source/utils/utils.h
         source/ray_tracer/RayTracer.cpp
         source/ray_tracer/RayTracer.h
-        source/materials/texture.cpp source/materials/texture.h source/objects/xy_rect.cpp source/objects/xy_rect.h)
+        source/materials/texture.cpp
+        source/materials/texture.h
+        source/objects/aarect.cpp
+        source/objects/aarect.h
+        source/objects/bounding-boxes/aabb.cpp
+        source/objects/bounding-boxes/aabb.h
+        source/objects/bvh.cpp
+        source/objects/bvh.h
+        source/objects/box.cpp source/objects/box.h)
 
 target_link_libraries(
         PROJECT LINK_PUBLIC -lyaml-cpp

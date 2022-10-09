@@ -54,7 +54,6 @@ double degrees_to_radians(double degrees);
 double clamp(double x, double min, double max);
 
 //Random number generation
-
 double random_double();
 double random_double_modern_cpp();
 double random_double(double min, double max);
@@ -63,6 +62,8 @@ static glm::vec3 random_vec3(double min, double max);
 glm::vec3 random_in_unit_sphere();
 glm::vec3 random_unit_vector();
 glm::vec3 random_in_hemisphere(const glm::vec3& normal);
+
+int random_int(int min, int max);
 
 bool near_zero(glm::vec3 vec);
 glm::vec3 reflect(const glm::vec3& v, const glm::vec3& n);

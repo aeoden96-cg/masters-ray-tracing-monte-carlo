@@ -10,27 +10,31 @@
 #include "camera/camera.h"
 #include "materials/material.h"
 #include "ray_tracer/RayTracer.h"
+#include "objects/aarect.h"
+#include "objects/box.h"
 
-//hittable_list cornell_box() {
-//    hittable_list objects;
-//
-//    auto red   = make_shared<lambertian>(color(.65, .05, .05));
-//    auto white = make_shared<lambertian>(color(.73, .73, .73));
-//    auto green = make_shared<lambertian>(color(.12, .45, .15));
-//    auto light = make_shared<diffuse_light>(color(15, 15, 15));
-//
-//    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
-//    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
-//    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
-//    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
-//    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
-//    objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
-//
-////    lookfrom = point3(278, 278, -800);
-////    lookat = point3(278, 278, 0);
-//
-//    return objects;
-//}
+hittable_list cornell_box() {
+    hittable_list objects;
+
+    auto red   = make_shared<lambertian>(color(.65, .05, .05));
+    auto white = make_shared<lambertian>(color(.73, .73, .73));
+    auto green = make_shared<lambertian>(color(.12, .45, .15));
+    auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 555, green));
+    objects.add(make_shared<yz_rect>(0, 555, 0, 555, 0, red));
+    objects.add(make_shared<xz_rect>(213, 343, 227, 332, 554, light));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 0, white));
+    objects.add(make_shared<xz_rect>(0, 555, 0, 555, 555, white));
+    objects.add(make_shared<xy_rect>(0, 555, 0, 555, 555, white));
+
+    objects.add(make_shared<box>(point3(130, 0, 65), point3(295, 165, 230), white));
+    objects.add(make_shared<box>(point3(265, 0, 295), point3(430, 330, 460), white));
+
+
+
+    return objects;
+}
 
 hittable_list random_scene() {
     hittable_list world;
@@ -157,8 +161,9 @@ int main() {
     RayTracer tracer(image_width, aspect_ratio,max_depth,samples_per_pixel);
 
 
-    auto world = random_scene();
+//    auto world = random_scene();
 //    auto world = read_file();
+auto world = cornell_box();
 
     // Camera and viewport
     auto viewport_height = config["camera"]["viewport_height"].as<float>();

@@ -45,3 +45,10 @@ void sphere::get_sphere_uv(const point3& p, double& u, double& v) {
     u = phi / (2*pi);
     v = theta / pi;
 }
+
+bool sphere::bounding_box(double time0, double time1, aabb& output_box) const {
+    output_box = aabb(
+            center - glm::vec3(radius, radius, radius),
+            center + glm::vec3(radius, radius, radius));
+    return true;
+}

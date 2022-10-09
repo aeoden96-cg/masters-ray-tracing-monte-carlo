@@ -19,15 +19,18 @@ void RayTracer::render(const hittable_list& world){
   color background(0,0,0);
   std::fstream file_out("image.ppm", std::ios::out);
 
+  //vfov is a vertical field of view in degrees
+  //focus_dist is the distance between the camera and the focus plane
+
 
   camera cam(
           this->origin,
-            this->look_at,
+          this->look_at,
           point3 (0,1,0),
-          20,
+          40,
           (float)width / (float)height,
           0.1f,
-          glm::length(this->origin));
+          glm::length(this->look_at - this->origin));
 
   file_out << "P3\n" << width << ' ' << height << "\n255\n";
 
