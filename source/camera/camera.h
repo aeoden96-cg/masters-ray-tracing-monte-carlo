@@ -18,7 +18,9 @@ public:
             float vfov, // vertical field-of-view in degrees
             float aspect_ratio,
             float aperture,
-            float focus_dist
+            float focus_dist,
+            double _time0 = 0,
+            double _time1 = 0
         );
 
     [[nodiscard]]
@@ -32,6 +34,7 @@ private:
     glm::vec3 vertical  = glm::vec3(0, 0, 0);
     glm::vec3 u, v, w;
     float lens_radius;
+    double time0, time1;  // shutter open/close times
 };
 
 
