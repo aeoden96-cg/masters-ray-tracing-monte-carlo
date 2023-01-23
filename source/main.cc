@@ -83,12 +83,12 @@ void cornell_box(hitable **scene, camera **cam, float aspect) {
     list[i++] = new translate(new rotate_y(
                     new box(vec3(0, 0, 0), vec3(165, 330, 165), white),  15), vec3(265,0,295));
     *scene = new hitable_list(list,i);
-    vec3 lookfrom(278, 278, -800);
-    vec3 lookat(278,278,0);
+    glm::vec3 lookfrom(278, 278, -800);
+    glm::vec3 lookat(278,278,0);
     float dist_to_focus = 10.0;
     float aperture = 0.0;
     float vfov = 40.0;
-    *cam = new camera(lookfrom, lookat, vec3(0,1,0),
+    *cam = new camera(lookfrom, lookat, glm::vec3(0,1,0),
                       vfov, aspect, aperture, dist_to_focus, 0.0, 1.0);
 }
 
