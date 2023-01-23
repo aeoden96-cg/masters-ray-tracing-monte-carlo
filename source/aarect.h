@@ -20,7 +20,7 @@ class xy_rect: public hitable  {
         xy_rect(float _x0, float _x1, float _y0, float _y1, float _k, material *mat) : x0(_x0), x1(_x1), y0(_y0), y1(_y1), k(_k), mp(mat) {};
         virtual bool hit(const ray& r, float t0, float t1, hit_record& rec) const;
         virtual bool bounding_box(float t0, float t1, aabb& box) const {
-               box =  aabb(vec3(x0,y0, k-0.0001).to_glm(), vec3(x1, y1, k+0.0001).to_glm());
+               box =  aabb(glm::vec3(x0,y0, k-0.0001), glm::vec3(x1, y1, k+0.0001));
                return true; }
         material  *mp;
         float x0, x1, y0, y1, k;
@@ -32,7 +32,7 @@ class xz_rect: public hitable  {
         xz_rect(float _x0, float _x1, float _z0, float _z1, float _k, material *mat) : x0(_x0), x1(_x1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
         virtual bool hit(const ray& r, float t0, float t1, hit_record& rec) const;
         virtual bool bounding_box(float t0, float t1, aabb& box) const {
-            box =  aabb(vec3(x0,k-0.0001,z0).to_glm(), vec3(x1, k+0.0001, z1).to_glm());
+            box =  aabb(glm::vec3(x0,k-0.0001,z0), glm::vec3(x1, k+0.0001, z1));
             return true; 
         }
         virtual float  pdf_value(const vec3& o, const vec3& v) const {
@@ -46,9 +46,9 @@ class xz_rect: public hitable  {
             else
                 return 0;
         }
-        virtual vec3 random(const vec3& o) const { 
-            vec3 random_point = vec3(x0 + drand48()*(x1-x0), k,  z0 + drand48()*(z1-z0)); 
-            return random_point - o;
+        virtual glm::vec3 random(const glm::vec3 &o) const {
+            vec3 random_point = vec3(x0 + drand48()*(x1-x0), k,  z0 + drand48()*(z1-z0));
+            return random_point.to_glm() - o;
         }
         material  *mp;
         float x0, x1, z0, z1, k;
@@ -60,7 +60,7 @@ class yz_rect: public hitable  {
         yz_rect(float _y0, float _y1, float _z0, float _z1, float _k, material *mat) : y0(_y0), y1(_y1), z0(_z0), z1(_z1), k(_k), mp(mat) {};
         virtual bool hit(const ray& r, float t0, float t1, hit_record& rec) const;
         virtual bool bounding_box(float t0, float t1, aabb& box) const {
-               box =  aabb(vec3(k-0.0001, y0, z0).to_glm(), vec3(k+0.0001, y1, z1).to_glm());
+               box =  aabb(glm::vec3(k-0.0001, y0, z0), glm::vec3(k+0.0001, y1, z1));
                return true; }
         material  *mp;
         float y0, y1, z0, z1, k;

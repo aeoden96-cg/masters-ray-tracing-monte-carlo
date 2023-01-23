@@ -16,15 +16,15 @@
 
 class hitable_list: public hitable  {
     public:
-        hitable_list() {}
+        hitable_list() = default;
         hitable_list(hitable **l, int n) {list = l; list_size = n; }
-        virtual bool hit(const ray& r, float tmin, float tmax, hit_record& rec) const;
-        virtual bool bounding_box(float t0, float t1, aabb& box) const;
-        virtual float  pdf_value(const vec3& o, const vec3& v) const;
-        virtual vec3 random(const vec3& o) const;
+        bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
+        bool bounding_box(float t0, float t1, aabb& box) const override;
+        float  pdf_value(const vec3& o, const vec3& v) const override;
+        glm::vec3 random(const glm::vec3 &o) const override;
 
-        hitable **list;
-        int list_size;
+        hitable **list{};
+        int list_size{};
 };
 
 float hitable_list::pdf_value(const vec3& o, const vec3& v) const {
@@ -35,7 +35,7 @@ float hitable_list::pdf_value(const vec3& o, const vec3& v) const {
     return sum;
 }
 
-vec3 hitable_list::random(const vec3& o) const {
+glm::vec3 hitable_list::random(const glm::vec3 &o) const {
         int index = int(drand48() * list_size);
         return list[ index ]->random(o);
 }

@@ -12,6 +12,7 @@
 #ifndef PDFH
 #define PDFH
 #include "onb.h"
+#include "hitable.h"
 
 
 inline vec3 random_cosine_direction() {
@@ -55,16 +56,16 @@ class pdf  {
 
 class cosine_pdf : public pdf {
     public:
-        cosine_pdf(const vec3& w) { uvw.build_from_w(w); }
+        cosine_pdf(const vec3& w) { uvw.build_from_w(w.to_glm()); }
         virtual float value(const vec3& direction) const {
-            float cosine = dot(unit_vector(direction), uvw.w());
+            float cosine = dot(unit_vector(direction), toVec3(uvw.w()));
             if (cosine > 0)
                 return cosine/M_PI;
             else
                 return 0;
         }
         virtual vec3 generate() const  {
-            return uvw.local(random_cosine_direction());
+            return toVec3(uvw.local(random_cosine_direction().to_glm()));
         }
         onb uvw;
 };
@@ -76,7 +77,7 @@ class hitable_pdf : public pdf {
             return ptr->pdf_value(o, direction);
         }
         virtual vec3 generate() const {
-            return ptr->random(o);
+            return toVec3(ptr->random(o.to_glm()));
         }
         vec3 o;
         hitable *ptr;
