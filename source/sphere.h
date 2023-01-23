@@ -22,15 +22,15 @@ class sphere: public hitable  {
         sphere(glm::vec3 cen, float r, material *m) : center(cen), radius(r), mat_ptr(m)  {};
         virtual bool hit(const ray& r, float tmin, float tmax, hit_record& rec) const;
         virtual bool bounding_box(float t0, float t1, aabb& box) const;
-        virtual float  pdf_value(const vec3& o, const vec3& v) const;
+        virtual float  pdf_value(const glm::vec3 &o, const vec3& v) const;
         virtual glm::vec3 random(const glm::vec3 &o) const;
         glm::vec3 center;
         float radius;
         material *mat_ptr;
 };
 
-float sphere::pdf_value(const vec3& o, const vec3& v) const {
-    auto _o = o.to_glm();
+float sphere::pdf_value(const glm::vec3 &o, const vec3& v) const {
+    auto _o = o;
     auto _v = v.to_glm();
 
     hit_record rec;

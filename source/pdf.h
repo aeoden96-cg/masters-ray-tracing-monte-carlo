@@ -74,7 +74,7 @@ class hitable_pdf : public pdf {
     public:
         hitable_pdf(hitable *p, const vec3& origin) : ptr(p), o(origin) {}
         virtual float value(const vec3& direction) const {
-            return ptr->pdf_value(o, direction);
+            return ptr->pdf_value(o.to_glm(), direction);
         }
         virtual vec3 generate() const {
             return toVec3(ptr->random(o.to_glm()));

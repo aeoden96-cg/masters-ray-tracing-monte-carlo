@@ -35,9 +35,9 @@ class xz_rect: public hitable  {
             box =  aabb(glm::vec3(x0,k-0.0001,z0), glm::vec3(x1, k+0.0001, z1));
             return true; 
         }
-        virtual float  pdf_value(const vec3& o, const vec3& v) const {
+        virtual float  pdf_value(const glm::vec3 &o, const vec3& v) const {
             hit_record rec;
-            if (this->hit(ray(o.to_glm(), v.to_glm()), 0.001, FLT_MAX, rec)) {
+            if (this->hit(ray(o, v.to_glm()), 0.001, FLT_MAX, rec)) {
                 float area = (x1-x0)*(z1-z0);
                 float distance_squared = rec.t * rec.t * v.squared_length();
                 float cosine = fabs(dot(v, toVec3(rec.normal)) / v.length());
