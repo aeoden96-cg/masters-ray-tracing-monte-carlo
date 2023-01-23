@@ -15,7 +15,7 @@
 #include "aarect.h"
 #include "hitable_list.h"
 
-class box: public hitable  {
+class box: public hittable  {
     public:
         box() {}
         box(const glm::vec3& p0, const glm::vec3& p1, material *ptr);
@@ -24,13 +24,13 @@ class box: public hitable  {
                box =  aabb(pmin, pmax);
                return true; }
         glm::vec3 pmin, pmax;
-        hitable *list_ptr;
+        hittable *list_ptr;
 };
 
 box::box(const glm::vec3& p0, const glm::vec3& p1, material *ptr) {
     pmin = p0;
     pmax = p1;
-    hitable **list = new hitable*[6];
+    hittable **list = new hittable*[6];
     list[0] = new xy_rect(p0.x, p1.x, p0.y, p1.y, p1.z, ptr);
     list[1] = new flip_normals(new xy_rect(p0.x, p1.x, p0.y, p1.y, p0.z, ptr));
     list[2] = new xz_rect(p0.x, p1.x, p0.z, p1.z, p1.y, ptr);

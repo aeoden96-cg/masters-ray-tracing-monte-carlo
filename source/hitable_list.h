@@ -12,18 +12,18 @@
 #ifndef HITABLELISTH
 #define HITABLELISTH
 
-#include "hitable.h"
+#include "hittable.h"
 
-class hitable_list: public hitable  {
+class hitable_list: public hittable  {
     public:
         hitable_list() = default;
-        hitable_list(hitable **l, int n) {list = l; list_size = n; }
+        hitable_list(hittable **l, int n) { list = l; list_size = n; }
         bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override;
         bool bounding_box(float t0, float t1, aabb& box) const override;
         float  pdf_value(const glm::vec3 &o, const vec3& v) const override;
         glm::vec3 random(const glm::vec3 &o) const override;
 
-        hitable **list{};
+        hittable **list{};
         int list_size{};
 };
 

@@ -12,7 +12,7 @@
 #ifndef PDFH
 #define PDFH
 #include "onb.h"
-#include "hitable.h"
+#include "hittable.h"
 
 
 inline vec3 random_cosine_direction() {
@@ -50,52 +50,52 @@ class pdf  {
     public:
         virtual float value(const glm::vec3& direction) const = 0;
         virtual glm::vec3 generate() const = 0;
-        ~pdf() {}
+        ~pdf() = default;
 };
 
 
 class cosine_pdf : public pdf {
     public:
-        cosine_pdf(const glm::vec3& w) { uvw.build_from_w(w); }
-        virtual float value(const glm::vec3& direction) const {
+        explicit cosine_pdf(const glm::vec3& w) { uvw.build_from_w(w); }
+        float value(const glm::vec3& direction) const override {
             float cosine = glm::dot(glm::normalize(direction), uvw.w());
             if (cosine > 0)
                 return cosine/M_PI;
             else
                 return 0;
         }
-        virtual glm::vec3 generate() const  {
+        glm::vec3 generate() const override  {
             return uvw.local(random_cosine_direction().to_glm());
         }
         onb uvw;
 };
 
-class hitable_pdf : public pdf {
+class hittable_pdf : public pdf {
     public:
-        hitable_pdf(hitable *p, const glm::vec3& origin) : ptr(p), o(origin) {}
-        virtual float value(const glm::vec3& direction) const {
+        hittable_pdf(hittable *p, const glm::vec3& origin) : ptr(p), o(origin) {}
+        float value(const glm::vec3& direction) const override {
             return ptr->pdf_value(o, toVec3(direction));
         }
-        virtual glm::vec3 generate() const {
+        glm::vec3 generate() const override {
             return ptr->random(o);
         }
-    glm::vec3 o;
-        hitable *ptr;
+        glm::vec3 o;
+        hittable *ptr;
 };
 
 class mixture_pdf : public pdf {
     public:
         mixture_pdf(pdf *p0, pdf *p1 ) { p[0] = p0; p[1] = p1; }
-        virtual float value(const glm::vec3& direction) const {
-            return 0.5 * p[0]->value(direction) + 0.5 *p[1]->value(direction);
+        float value(const glm::vec3& direction) const override {
+            return 0.5f * p[0]->value(direction) + 0.5 *p[1]->value(direction);
         }
-        virtual glm::vec3 generate() const {
+        glm::vec3 generate() const override {
             if (drand48() < 0.5)
                 return p[0]->generate();
             else
                 return p[1]->generate();
         }
-        pdf *p[2];
+        pdf *p[2]{};
 };
 
 #endif

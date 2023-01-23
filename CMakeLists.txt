@@ -11,7 +11,7 @@ ADD_EXECUTABLE(PROJECT
         source/bucamera.h
         source/camera.h
         source/constant_medium.h
-        source/hitable.h
+        source/hittable.h
         source/hitable_list.h
         source/material.h
         source/moving_sphere.h

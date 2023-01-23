@@ -37,7 +37,7 @@ inline glm::vec3 de_nan(const glm::vec3& c) {
 
 using color = vec3;    // RGB color
 
-vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
+vec3 trace(const ray& r, hittable *world, hittable *light_shape, int depth) {
     hit_record hrec;
     if (world->hit(r, 0.001, MAXFLOAT, hrec)) {
         scatter_record srec;
@@ -47,7 +47,7 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
                 return srec.attenuation * trace(srec.specular_ray, world, light_shape, depth + 1);
             }
             else {
-                hitable_pdf plight(light_shape, hrec.p);
+                hittable_pdf plight(light_shape, hrec.p);
                 mixture_pdf p(&plight, srec.pdf_ptr);
                 ray scattered = ray(hrec.p, p.generate(), r.time());
                 float pdf_val = p.value(scattered.direction());
@@ -65,9 +65,9 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
 
 
 
-void cornell_box(hitable **scene, camera **cam, float aspect) {
+void cornell_box(hittable **scene, camera **cam, float aspect) {
     int i = 0;
-    hitable **list = new hitable*[8];
+    hittable **list = new hittable*[8];
     material *red = new lambertian( new constant_texture(glm::vec3(0.65, 0.05, 0.05)) );
     material *white = new lambertian( new constant_texture(glm::vec3(0.73, 0.73, 0.73)) );
     material *green = new lambertian( new constant_texture(glm::vec3(0.12, 0.45, 0.15)) );
@@ -99,13 +99,13 @@ int main() {
     auto fp = fopen("image.ppm", "w");
     std::cout << "P3\n" << nx << " " << ny << "\n255\n";
     fprintf(fp, "P3\n%d %d\n255\n ", nx, ny);
-    hitable *world;
+    hittable *world;
     camera *cam;
     float aspect = float(ny) / float(nx);
     cornell_box(&world, &cam, aspect);
-    hitable *light_shape = new xz_rect(213, 343, 227, 332, 554, 0);
-    hitable *glass_sphere = new sphere(glm::vec3(190, 90, 190), 90, 0);
-    hitable *a[2];
+    hittable *light_shape = new xz_rect(213, 343, 227, 332, 554, 0);
+    hittable *glass_sphere = new sphere(glm::vec3(190, 90, 190), 90, 0);
+    hittable *a[2];
     a[0] = light_shape;
     a[1] = glass_sphere;
     hitable_list hlist(a,2);

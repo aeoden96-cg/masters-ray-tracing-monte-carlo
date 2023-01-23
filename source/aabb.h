@@ -12,7 +12,7 @@
 #ifndef AABBH
 #define AABBH
 #include "ray.h"
-#include "hitable.h"
+#include "hittable.h"
 
 #include <glm/glm.hpp>
 

@@ -15,7 +15,7 @@
 struct hit_record;
 
 #include "ray.h"
-#include "hitable.h"
+#include "hittable.h"
 #include "texture.h"
 
 
