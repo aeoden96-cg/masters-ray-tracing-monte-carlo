@@ -54,7 +54,7 @@ class noise_texture : public texture {
         virtual glm::vec3 value(float u, float v, const glm::vec3& p) const {
 //            return glm::vec3(1,1,1)*0.5*(1 + noise.turb(scale * p));
 //            return glm::vec3(1,1,1)*noise.turb(scale * p);
-              return glm::vec3(1,1,1)* 0.5f * (1 + sin(scale*p.x + 5*noise.turb(scale * toVec3(p)))) ;
+              return glm::vec3(1,1,1)* 0.5f * (1 + sin(scale*p.x + 5*noise.turb(scale * p))) ;
         }
         perlin noise;
         float scale;
