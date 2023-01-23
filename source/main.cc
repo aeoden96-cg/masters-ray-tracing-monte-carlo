@@ -41,15 +41,15 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
     hit_record hrec;
     if (world->hit(r, 0.001, MAXFLOAT, hrec)) {
         scatter_record srec;
-        vec3 emitted = hrec.mat_ptr->emitted(r, hrec, hrec.u, hrec.v, hrec.p);
+        vec3 emitted = hrec.mat_ptr->emitted(r, hrec, hrec.u, hrec.v, toVec3(hrec.p));
         if (depth < 50 && hrec.mat_ptr->scatter(r, hrec, srec)) {
             if (srec.is_specular) {
                 return srec.attenuation * trace(srec.specular_ray, world, light_shape, depth + 1);
             }
             else {
-                hitable_pdf plight(light_shape, hrec.p);
+                hitable_pdf plight(light_shape, toVec3(hrec.p));
                 mixture_pdf p(&plight, srec.pdf_ptr);
-                ray scattered = ray(hrec.p.to_glm(), p.generate().to_glm(), r.time());
+                ray scattered = ray(hrec.p, p.generate().to_glm(), r.time());
                 float pdf_val = p.value(toVec3(scattered.direction()));
                 delete srec.pdf_ptr;
                 return emitted + srec.attenuation * hrec.mat_ptr->scattering_pdf(r, hrec, scattered) *

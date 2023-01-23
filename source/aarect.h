@@ -40,7 +40,7 @@ class xz_rect: public hitable  {
             if (this->hit(ray(o.to_glm(), v.to_glm()), 0.001, FLT_MAX, rec)) {
                 float area = (x1-x0)*(z1-z0);
                 float distance_squared = rec.t * rec.t * v.squared_length();
-                float cosine = fabs(dot(v, rec.normal) / v.length());
+                float cosine = fabs(dot(v, toVec3(rec.normal)) / v.length());
                 return  distance_squared / (cosine * area);
             }
             else
@@ -81,8 +81,8 @@ bool xy_rect::hit(const ray& r, float t0, float t1, hit_record& rec) const {
     rec.v = (y-y0)/(y1-y0); 
     rec.t = t;
     rec.mat_ptr = mp;
-    rec.p = toVec3(r.point_at_parameter(t));
-    rec.normal = vec3(0, 0, 1);
+    rec.p = r.point_at_parameter(t);
+    rec.normal = glm::vec3(0, 0, 1);
     return true;
 }
 
@@ -99,8 +99,8 @@ bool xz_rect::hit(const ray& r, float t0, float t1, hit_record& rec) const {
     rec.v = (z-z0)/(z1-z0); 
     rec.t = t;
     rec.mat_ptr = mp;
-    rec.p = toVec3(r.point_at_parameter(t));
-    rec.normal = vec3(0, 1, 0);
+    rec.p = r.point_at_parameter(t);
+    rec.normal = glm::vec3(0, 1, 0);
     return true;
 }
 
@@ -116,8 +116,8 @@ bool yz_rect::hit(const ray& r, float t0, float t1, hit_record& rec) const {
     rec.v = (z-z0)/(z1-z0); 
     rec.t = t;
     rec.mat_ptr = mp;
-    rec.p = toVec3(r.point_at_parameter(t));
-    rec.normal = vec3(1, 0, 0);
+    rec.p = r.point_at_parameter(t);
+    rec.normal = glm::vec3 (1, 0, 0);
     return true;
 }
 

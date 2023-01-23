@@ -15,11 +15,13 @@
 #include "aabb.h"
 #include <float.h>
 
+#include <glm/glm.hpp>
+
 class material;
 
-void get_sphere_uv(const vec3& p, float& u, float& v) {
-    float phi = atan2(p.z(), p.x());
-    float theta = asin(p.y());
+void get_sphere_uv(const glm::vec3& p, float& u, float& v) {
+    float phi = atan2(p.z, p.x);
+    float theta = asin(p.y);
     u = 1-(phi + M_PI) / (2*M_PI);
     v = (theta + M_PI/2) / M_PI;
 }
@@ -30,8 +32,8 @@ struct hit_record
     float t;
     float u;
     float v;
-    vec3 p;
-    vec3 normal;
+    glm::vec3 p;
+    glm::vec3 normal;
     material *mat_ptr;
 };
 
@@ -72,7 +74,7 @@ class translate : public hitable {
 bool translate::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {
     ray moved_r(r.origin() - offset.to_glm(), r.direction(), r.time());
     if (ptr->hit(moved_r, t_min, t_max, rec)) {
-        rec.p += offset;
+        rec.p += offset.to_glm();
         return true;
     }
     else
@@ -139,14 +141,14 @@ bool rotate_y::hit(const ray& r, float t_min, float t_max, hit_record& rec) cons
     direction[2] = sin_theta*r.direction()[0] + cos_theta*r.direction()[2];
     ray rotated_r(origin, direction, r.time());
     if (ptr->hit(rotated_r, t_min, t_max, rec)) {
-        vec3 p = rec.p;
-        vec3 normal = rec.normal;
+        vec3 p = toVec3(rec.p);
+        vec3 normal = toVec3(rec.normal);
         p[0] = cos_theta*rec.p[0] + sin_theta*rec.p[2];
         p[2] = -sin_theta*rec.p[0] + cos_theta*rec.p[2];
         normal[0] = cos_theta*rec.normal[0] + sin_theta*rec.normal[2];
         normal[2] = -sin_theta*rec.normal[0] + cos_theta*rec.normal[2];
-        rec.p = p;
-        rec.normal = normal;
+        rec.p = p.to_glm();
+        rec.normal = normal.to_glm();
         return true;
     }
     else

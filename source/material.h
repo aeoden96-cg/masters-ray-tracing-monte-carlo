@@ -71,20 +71,20 @@ class dielectric : public material {
             srec.pdf_ptr = 0;
             srec.attenuation = vec3(1.0, 1.0, 1.0);
             vec3 outward_normal;
-             vec3 reflected = reflect(toVec3(r_in.direction()), hrec.normal);
+             vec3 reflected = reflect(toVec3(r_in.direction()), toVec3(hrec.normal));
              vec3 refracted;
              float ni_over_nt;
              float reflect_prob;
              float cosine;
-             if (dot(toVec3(r_in.direction()), hrec.normal) > 0) {
-                  outward_normal = -hrec.normal;
+             if (dot(toVec3(r_in.direction()),  toVec3(hrec.normal)) > 0) {
+                  outward_normal = - toVec3(hrec.normal);
                   ni_over_nt = ref_idx;
-                  cosine = ref_idx * dot(toVec3(r_in.direction()), hrec.normal) / r_in.direction().length();
+                  cosine = ref_idx * dot(toVec3(r_in.direction()),   toVec3(hrec.normal)) / r_in.direction().length();
              }
              else {
-                  outward_normal = hrec.normal;
+                  outward_normal =  toVec3(hrec.normal);
                   ni_over_nt = 1.0 / ref_idx;
-                  cosine = -dot(toVec3(r_in.direction()), hrec.normal) / r_in.direction().length();
+                  cosine = -dot(toVec3(r_in.direction()),  toVec3(hrec.normal)) / r_in.direction().length();
              }
              if (refract(toVec3(r_in.direction()), outward_normal, ni_over_nt, refracted)) {
                 reflect_prob = schlick(cosine, ref_idx);
@@ -93,10 +93,10 @@ class dielectric : public material {
                 reflect_prob = 1.0;
              }
              if (drand48() < reflect_prob) {
-                srec.specular_ray = ray(hrec.p.to_glm(), reflected.to_glm());
+                srec.specular_ray = ray(hrec.p, reflected.to_glm());
              }
              else {
-                srec.specular_ray = ray(hrec.p.to_glm(), refracted.to_glm());
+                srec.specular_ray = ray(hrec.p, refracted.to_glm());
              }
              return true;
         }
@@ -109,8 +109,8 @@ class metal : public material {
     public:
         metal(const vec3& a, float f) : albedo(a) { if (f < 1) fuzz = f; else fuzz = 1; }
         virtual bool scatter(const ray& r_in, const hit_record& hrec, scatter_record& srec) const {
-            vec3 reflected = reflect(unit_vector(toVec3(r_in.direction())), hrec.normal);
-            srec.specular_ray = ray(hrec.p.to_glm(), (reflected + fuzz*random_in_unit_sphere()).to_glm());
+            vec3 reflected = reflect(unit_vector(toVec3(r_in.direction())),  toVec3(hrec.normal));
+            srec.specular_ray = ray(hrec.p, (reflected + fuzz*random_in_unit_sphere()).to_glm());
             srec.attenuation = albedo;
             srec.is_specular = true;
             srec.pdf_ptr = 0;
@@ -126,15 +126,15 @@ class lambertian : public material {
     public:
         lambertian(texture *a) : albedo(a) {}
         float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
-            float cosine = dot(rec.normal, unit_vector(toVec3(scattered.direction())));
+            float cosine = dot( toVec3(rec.normal), unit_vector(toVec3(scattered.direction())));
             if (cosine < 0)
                 return 0;
             return cosine / M_PI;
         }
         bool scatter(const ray& r_in, const hit_record& hrec, scatter_record& srec) const {
             srec.is_specular = false;
-            srec.attenuation = toVec3(albedo->value(hrec.u, hrec.v, hrec.p.to_glm()));
-            srec.pdf_ptr = new cosine_pdf(hrec.normal);
+            srec.attenuation = toVec3(albedo->value(hrec.u, hrec.v, hrec.p));
+            srec.pdf_ptr = new cosine_pdf( toVec3(hrec.normal));
             return true;
         }
         texture *albedo;
@@ -145,7 +145,7 @@ class diffuse_light : public material  {
     public:
         diffuse_light(texture *a) : emit(a) {}
         virtual vec3 emitted(const ray& r_in, const hit_record& rec, float u, float v, const vec3& p) const {
-            if (dot(rec.normal, toVec3(r_in.direction())) < 0.0)
+            if (dot( toVec3(rec.normal), toVec3(r_in.direction())) < 0.0)
                 return toVec3(emit->value(u, v, p.to_glm()));
             else
                 return vec3(0,0,0);
