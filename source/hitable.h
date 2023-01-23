@@ -16,6 +16,7 @@
 #include <float.h>
 
 #include <glm/glm.hpp>
+#include "vec3.h"
 
 class material;
 

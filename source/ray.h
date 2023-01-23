@@ -11,7 +11,6 @@
 
 #ifndef RAYH
 #define RAYH
-#include "vec3.h"
 
 #include <glm/glm.hpp>
 

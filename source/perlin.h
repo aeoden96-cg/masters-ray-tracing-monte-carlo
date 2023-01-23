@@ -12,8 +12,6 @@
 #ifndef PERLINH
 #define PERLINH
 
-#include "vec3.h"
-
 #include <glm/glm.hpp>
 
 

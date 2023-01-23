@@ -11,7 +11,6 @@
 
 #ifndef ONBH
 #define ONBH
-#include "vec3.h"
 
 #include <glm/glm.hpp>
 
