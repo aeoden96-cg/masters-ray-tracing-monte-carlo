@@ -134,7 +134,7 @@ class lambertian : public material {
         bool scatter(const ray& r_in, const hit_record& hrec, scatter_record& srec) const {
             srec.is_specular = false;
             srec.attenuation = toVec3(albedo->value(hrec.u, hrec.v, hrec.p));
-            srec.pdf_ptr = new cosine_pdf( toVec3(hrec.normal));
+            srec.pdf_ptr = new cosine_pdf( hrec.normal);
             return true;
         }
         texture *albedo;

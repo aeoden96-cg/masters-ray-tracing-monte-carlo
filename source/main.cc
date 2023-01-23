@@ -47,10 +47,10 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
                 return srec.attenuation * trace(srec.specular_ray, world, light_shape, depth + 1);
             }
             else {
-                hitable_pdf plight(light_shape, toVec3(hrec.p));
+                hitable_pdf plight(light_shape, hrec.p);
                 mixture_pdf p(&plight, srec.pdf_ptr);
-                ray scattered = ray(hrec.p, p.generate().to_glm(), r.time());
-                float pdf_val = p.value(toVec3(scattered.direction()));
+                ray scattered = ray(hrec.p, p.generate(), r.time());
+                float pdf_val = p.value(scattered.direction());
                 delete srec.pdf_ptr;
                 return emitted + srec.attenuation * hrec.mat_ptr->scattering_pdf(r, hrec, scattered) *
                                          trace(scattered, world, light_shape, depth + 1) / pdf_val;
@@ -81,7 +81,7 @@ void cornell_box(hitable **scene, camera **cam, float aspect) {
     material *glass = new dielectric(1.5);
     list[i++] = new sphere(glm::vec3(190, 90, 190),90 , glass);
     list[i++] = new translate(new rotate_y(
-                    new box(vec3(0, 0, 0), vec3(165, 330, 165), white),  15), vec3(265,0,295));
+                    new box(glm::vec3(0, 0, 0), glm::vec3(165, 330, 165), white),  15), glm::vec3(265,0,295));
     *scene = new hitable_list(list,i);
     glm::vec3 lookfrom(278, 278, -800);
     glm::vec3 lookat(278,278,0);

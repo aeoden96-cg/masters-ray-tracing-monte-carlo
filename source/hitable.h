@@ -65,17 +65,17 @@ class flip_normals : public hitable {
 
 class translate : public hitable {
     public:
-        translate(hitable *p, const vec3& displacement) : ptr(p), offset(displacement) {}
+        translate(hitable *p, const glm::vec3& displacement) : ptr(p), offset(displacement) {}
         virtual bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const;
         virtual bool bounding_box(float t0, float t1, aabb& box) const;
         hitable *ptr;
-        vec3 offset;
+        glm::vec3 offset;
 };
 
 bool translate::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {
-    ray moved_r(r.origin() - offset.to_glm(), r.direction(), r.time());
+    ray moved_r(r.origin() - offset, r.direction(), r.time());
     if (ptr->hit(moved_r, t_min, t_max, rec)) {
-        rec.p += offset.to_glm();
+        rec.p += offset;
         return true;
     }
     else
@@ -84,7 +84,7 @@ bool translate::hit(const ray& r, float t_min, float t_max, hit_record& rec) con
 
 bool translate::bounding_box(float t0, float t1, aabb& box) const {
     if (ptr->bounding_box(t0, t1, box)) {
-        box = aabb(box.min() + offset.to_glm(), box.max()+offset.to_glm());
+        box = aabb(box.min() + offset, box.max()+offset);
         return true;
     }
     else
@@ -119,7 +119,7 @@ rotate_y::rotate_y(hitable *p, float angle) : ptr(p) {
                 float z = k*bbox.max().z + (1-k)*bbox.min().z;
                 float newx = cos_theta*x + sin_theta*z;
                 float newz = -sin_theta*x + cos_theta*z;
-                vec3 tester(newx, y, newz);
+                glm::vec3 tester(newx, y, newz);
                 for ( int c = 0; c < 3; c++ )
                 {
                     if ( tester[c] > max[c] )
@@ -142,14 +142,14 @@ bool rotate_y::hit(const ray& r, float t_min, float t_max, hit_record& rec) cons
     direction[2] = sin_theta*r.direction()[0] + cos_theta*r.direction()[2];
     ray rotated_r(origin, direction, r.time());
     if (ptr->hit(rotated_r, t_min, t_max, rec)) {
-        vec3 p = toVec3(rec.p);
-        vec3 normal = toVec3(rec.normal);
+        glm::vec3 p = rec.p;
+        glm::vec3 normal = rec.normal;
         p[0] = cos_theta*rec.p[0] + sin_theta*rec.p[2];
         p[2] = -sin_theta*rec.p[0] + cos_theta*rec.p[2];
         normal[0] = cos_theta*rec.normal[0] + sin_theta*rec.normal[2];
         normal[2] = -sin_theta*rec.normal[0] + cos_theta*rec.normal[2];
-        rec.p = p.to_glm();
-        rec.normal = normal.to_glm();
+        rec.p = p;
+        rec.normal = normal;
         return true;
     }
     else
