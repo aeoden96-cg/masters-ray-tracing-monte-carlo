@@ -71,32 +71,32 @@ class dielectric : public material {
             srec.pdf_ptr = 0;
             srec.attenuation = vec3(1.0, 1.0, 1.0);
             vec3 outward_normal;
-             vec3 reflected = reflect(r_in.direction(), hrec.normal);
+             vec3 reflected = reflect(toVec3(r_in.direction()), hrec.normal);
              vec3 refracted;
              float ni_over_nt;
              float reflect_prob;
              float cosine;
-             if (dot(r_in.direction(), hrec.normal) > 0) {
+             if (dot(toVec3(r_in.direction()), hrec.normal) > 0) {
                   outward_normal = -hrec.normal;
                   ni_over_nt = ref_idx;
-                  cosine = ref_idx * dot(r_in.direction(), hrec.normal) / r_in.direction().length();
+                  cosine = ref_idx * dot(toVec3(r_in.direction()), hrec.normal) / r_in.direction().length();
              }
              else {
                   outward_normal = hrec.normal;
                   ni_over_nt = 1.0 / ref_idx;
-                  cosine = -dot(r_in.direction(), hrec.normal) / r_in.direction().length();
+                  cosine = -dot(toVec3(r_in.direction()), hrec.normal) / r_in.direction().length();
              }
-             if (refract(r_in.direction(), outward_normal, ni_over_nt, refracted)) {
+             if (refract(toVec3(r_in.direction()), outward_normal, ni_over_nt, refracted)) {
                 reflect_prob = schlick(cosine, ref_idx);
              }
              else {
                 reflect_prob = 1.0;
              }
              if (drand48() < reflect_prob) {
-                srec.specular_ray = ray(hrec.p, reflected);
+                srec.specular_ray = ray(hrec.p.to_glm(), reflected.to_glm());
              }
              else {
-                srec.specular_ray = ray(hrec.p, refracted);
+                srec.specular_ray = ray(hrec.p.to_glm(), refracted.to_glm());
              }
              return true;
         }
@@ -109,8 +109,8 @@ class metal : public material {
     public:
         metal(const vec3& a, float f) : albedo(a) { if (f < 1) fuzz = f; else fuzz = 1; }
         virtual bool scatter(const ray& r_in, const hit_record& hrec, scatter_record& srec) const {
-            vec3 reflected = reflect(unit_vector(r_in.direction()), hrec.normal);
-            srec.specular_ray = ray(hrec.p, reflected + fuzz*random_in_unit_sphere());
+            vec3 reflected = reflect(unit_vector(toVec3(r_in.direction())), hrec.normal);
+            srec.specular_ray = ray(hrec.p.to_glm(), (reflected + fuzz*random_in_unit_sphere()).to_glm());
             srec.attenuation = albedo;
             srec.is_specular = true;
             srec.pdf_ptr = 0;
@@ -126,7 +126,7 @@ class lambertian : public material {
     public:
         lambertian(texture *a) : albedo(a) {}
         float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const {
-            float cosine = dot(rec.normal, unit_vector(scattered.direction()));
+            float cosine = dot(rec.normal, unit_vector(toVec3(scattered.direction())));
             if (cosine < 0)
                 return 0;
             return cosine / M_PI;
@@ -145,7 +145,7 @@ class diffuse_light : public material  {
     public:
         diffuse_light(texture *a) : emit(a) {}
         virtual vec3 emitted(const ray& r_in, const hit_record& rec, float u, float v, const vec3& p) const {
-            if (dot(rec.normal, r_in.direction()) < 0.0)
+            if (dot(rec.normal, toVec3(r_in.direction())) < 0.0)
                 return emit->value(u, v, p);
             else
                 return vec3(0,0,0);

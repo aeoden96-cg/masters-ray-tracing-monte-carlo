@@ -14,6 +14,8 @@
 
 #include "hitable.h"
 
+#include <glm/glm.hpp>
+
 class moving_sphere: public hitable  {
     public:
         moving_sphere() {}
@@ -43,16 +45,16 @@ bool moving_sphere::bounding_box(float t0, float t1, aabb& box) const {
 
 // replace "center" with "center(r.time())"
 bool moving_sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {
-    vec3 oc = r.origin() - center(r.time());
+    vec3 oc = toVec3(r.origin()) - center(r.time());
     float a = dot(r.direction(), r.direction());
-    float b = dot(oc, r.direction());
+    float b = dot(oc, toVec3(r.direction()));
     float c = dot(oc, oc) - radius*radius;
     float discriminant = b*b - a*c;
     if (discriminant > 0) {
         float temp = (-b - sqrt(discriminant))/a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
+            rec.p = toVec3(r.point_at_parameter(rec.t));
             rec.normal = (rec.p - center(r.time())) / radius;
             rec.mat_ptr = mat_ptr;
             return true;
@@ -60,7 +62,7 @@ bool moving_sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec)
         temp = (-b + sqrt(discriminant))/a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
+            rec.p = toVec3(r.point_at_parameter(rec.t));
             rec.normal = (rec.p - center(r.time())) / radius;
             rec.mat_ptr = mat_ptr;
             return true;

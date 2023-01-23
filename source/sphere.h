@@ -31,7 +31,7 @@ class sphere: public hitable  {
 
 float sphere::pdf_value(const vec3& o, const vec3& v) const {
     hit_record rec;
-    if (this->hit(ray(o, v), 0.001, FLT_MAX, rec)) {
+    if (this->hit(ray(o.to_glm(), v.to_glm()), 0.001, FLT_MAX, rec)) {
         float cos_theta_max = sqrt(1 - radius*radius/(center-o).squared_length());
         float solid_angle = 2*M_PI*(1-cos_theta_max);
         return  1 / solid_angle;
@@ -55,16 +55,16 @@ bool sphere::bounding_box(float t0, float t1, aabb& box) const {
 }
 
 bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const {
-    vec3 oc = r.origin() - center;
+    vec3 oc = toVec3(r.origin()) - center;
     float a = dot(r.direction(), r.direction());
-    float b = dot(oc, r.direction());
+    float b = dot(oc, toVec3(r.direction()));
     float c = dot(oc, oc) - radius*radius;
     float discriminant = b*b - a*c;
     if (discriminant > 0) {
         float temp = (-b - sqrt(b*b-a*c))/a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
+            rec.p = toVec3(r.point_at_parameter(rec.t));
             get_sphere_uv((rec.p-center)/radius, rec.u, rec.v);
             rec.normal = (rec.p - center) / radius;
             rec.mat_ptr = mat_ptr;
@@ -73,7 +73,7 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& rec) const 
         temp = (-b + sqrt(b*b-a*c))/a;
         if (temp < t_max && temp > t_min) {
             rec.t = temp;
-            rec.p = r.point_at_parameter(rec.t);
+            rec.p = toVec3(r.point_at_parameter(rec.t));
             get_sphere_uv((rec.p-center)/radius, rec.u, rec.v);
             rec.normal = (rec.p - center) / radius;
             rec.mat_ptr = mat_ptr;

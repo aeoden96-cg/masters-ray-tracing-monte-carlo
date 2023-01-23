@@ -49,8 +49,8 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
             else {
                 hitable_pdf plight(light_shape, hrec.p);
                 mixture_pdf p(&plight, srec.pdf_ptr);
-                ray scattered = ray(hrec.p, p.generate(), r.time());
-                float pdf_val = p.value(scattered.direction());
+                ray scattered = ray(hrec.p.to_glm(), p.generate().to_glm(), r.time());
+                float pdf_val = p.value(toVec3(scattered.direction()));
                 delete srec.pdf_ptr;
                 return emitted + srec.attenuation * hrec.mat_ptr->scattering_pdf(r, hrec, scattered) *
                                          trace(scattered, world, light_shape, depth + 1) / pdf_val;
@@ -117,7 +117,7 @@ int main() {
                 float u = float(i+drand48())/ float(nx);
                 float v = float(j+drand48())/ float(ny);
                 ray r = cam->get_ray(u, v);
-                glm::vec3 p = r.point_at_parameter(2.0).to_glm();
+                glm::vec3 p = r.point_at_parameter(2.0);
                 col += de_nan(trace(r, world, &hlist, 0).to_glm());
             }
             col /= float(ns);
