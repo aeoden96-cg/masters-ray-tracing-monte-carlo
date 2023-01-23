@@ -35,8 +35,8 @@ vec3 moving_sphere::center(float time) const{
 
 
 bool moving_sphere::bounding_box(float t0, float t1, aabb& box) const {
-        aabb box0(center(t0) - vec3(radius, radius, radius), center(t0) + vec3(radius, radius, radius));
-        aabb box1(center(t1) - vec3(radius, radius, radius), center(t1) + vec3(radius, radius, radius));
+        aabb box0(center(t0).to_glm() - vec3(radius, radius, radius).to_glm(), center(t0).to_glm() + vec3(radius, radius, radius).to_glm());
+        aabb box1(center(t1).to_glm() - vec3(radius, radius, radius).to_glm(), center(t1).to_glm() + vec3(radius, radius, radius).to_glm());
         box = surrounding_box(box0, box1);
         return true;
 }
