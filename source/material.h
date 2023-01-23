@@ -133,7 +133,7 @@ class lambertian : public material {
         }
         bool scatter(const ray& r_in, const hit_record& hrec, scatter_record& srec) const {
             srec.is_specular = false;
-            srec.attenuation = albedo->value(hrec.u, hrec.v, hrec.p);
+            srec.attenuation = toVec3(albedo->value(hrec.u, hrec.v, hrec.p.to_glm()));
             srec.pdf_ptr = new cosine_pdf(hrec.normal);
             return true;
         }
@@ -146,7 +146,7 @@ class diffuse_light : public material  {
         diffuse_light(texture *a) : emit(a) {}
         virtual vec3 emitted(const ray& r_in, const hit_record& rec, float u, float v, const vec3& p) const {
             if (dot(rec.normal, toVec3(r_in.direction())) < 0.0)
-                return emit->value(u, v, p);
+                return toVec3(emit->value(u, v, p.to_glm()));
             else
                 return vec3(0,0,0);
         }

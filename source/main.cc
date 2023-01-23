@@ -68,10 +68,10 @@ vec3 trace(const ray& r, hitable *world, hitable *light_shape, int depth) {
 void cornell_box(hitable **scene, camera **cam, float aspect) {
     int i = 0;
     hitable **list = new hitable*[8];
-    material *red = new lambertian( new constant_texture(vec3(0.65, 0.05, 0.05)) );
-    material *white = new lambertian( new constant_texture(vec3(0.73, 0.73, 0.73)) );
-    material *green = new lambertian( new constant_texture(vec3(0.12, 0.45, 0.15)) );
-    material *light = new diffuse_light( new constant_texture(vec3(15, 15, 15)) );
+    material *red = new lambertian( new constant_texture(vec3(0.65, 0.05, 0.05).to_glm()) );
+    material *white = new lambertian( new constant_texture(vec3(0.73, 0.73, 0.73).to_glm()) );
+    material *green = new lambertian( new constant_texture(vec3(0.12, 0.45, 0.15).to_glm()) );
+    material *light = new diffuse_light( new constant_texture(vec3(15, 15, 15).to_glm()) );
     list[i++] = new flip_normals(new yz_rect(0, 555, 0, 555, 555, green));
     list[i++] = new yz_rect(0, 555, 0, 555, 0, red);
     list[i++] = new flip_normals(new xz_rect(213, 343, 227, 332, 554, light));
